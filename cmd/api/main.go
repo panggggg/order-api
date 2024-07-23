@@ -46,7 +46,6 @@ func main() {
 		QueueNames:   queueNames,
 		ExchangeName: cfg.OrderExchangeName,
 		ExchangeType: cfg.OrderExchangeType,
-		RoutingKey:   cfg.OrderQueueName,
 		DeadLetter: []map[string]interface{}{
 			{"x-dead-letter-exchange": cfg.OrderDLX},
 		},

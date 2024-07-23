@@ -74,13 +74,10 @@ func (r order) SendToQueue(ctx context.Context, order []string) error {
 }
 
 func (o order) IsExist(ctx context.Context, order entity.Order) (bool, error) {
-	orderId := fmt.Sprintf("%s_%s", order.OrderId, order.Status)
-	value, err := o.redisAdapter.Get(orderId)
+	orderId := order.OrderId
+	_, err := o.redisAdapter.Get(orderId)
 	if err != nil {
-		return false, err
-	}
-	if value != nil {
-		return true, nil
+		return true, err
 	}
 	// var orderStatus entity.Order
 	// err = json.Unmarshal([]byte(*value), &orderStatus)
