@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/panggggg/order-service/config"
 	"github.com/panggggg/order-service/pkg/adapter"
 	"github.com/panggggg/order-service/pkg/entity"
+	"github.com/panggggg/order-service/pkg/service"
 	"github.com/wisesight/spider-go-utilities/database"
 	"github.com/wisesight/spider-go-utilities/queue"
 	"go.mongodb.org/mongo-driver/bson"
@@ -44,13 +44,14 @@ func NewOrder(mongoDBAdapter database.MongoDB, orderCollection database.MongoCol
 }
 
 func (o order) Upsert(ctx context.Context, orderId string, updateData entity.Order) (bool, error) {
+	timer := service.NewTime()
 	query := bson.M{
 		"_id": "order_" + orderId,
 	}
 	update := bson.M{
 		"$set": updateData,
 		"$setOnInsert": bson.M{
-			"created_at": time.Now(),
+			"created_at": timer.Now(),
 		},
 		"$currentDate": bson.M{
 			"updated_at": true,
@@ -65,11 +66,12 @@ func (o order) Upsert(ctx context.Context, orderId string, updateData entity.Ord
 }
 
 func (o order) Set(ctx context.Context, order entity.Order) (*primitive.ObjectID, error) {
+	timer := service.NewTime()
 	formatData := map[string]interface{}{
 		"order_id":   order.OrderId,
 		"status":     order.Status,
 		"remark":     order.Remark,
-		"created_at": time.Now(),
+		"created_at": timer.Now(),
 	}
 	result, err := o.mongodbAdapter.InsertOne(ctx, o.orderStatusCollection, formatData)
 	if err != nil {

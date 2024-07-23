@@ -56,6 +56,7 @@ func (r order) Upsert(ctx context.Context, orderId string, updateData entity.Ord
 		defer wg.Done()
 		_, err := r.orderRepo.Upsert(ctx, orderId, updateData)
 		if err != nil {
+			fmt.Println("ERR ===>", err)
 			updateError = err
 			return
 		}
@@ -82,16 +83,16 @@ func (o order) IsExist(ctx context.Context, order entity.Order) (bool, error) {
 	if value != nil {
 		return true, nil
 	}
-	// var orderStatus entity.Order
-	// err = json.Unmarshal([]byte(*value), &orderStatus)
+	var orderStatus entity.Order
+	err = json.Unmarshal([]byte(*value), &orderStatus)
 
-	// if err != nil {
-	// 	return false, err
-	// }
+	if err != nil {
+		return false, err
+	}
 
-	// if value != nil && orderStatus.Status == order.Status {
-	// 	return true, nil
-	// }
+	if value != nil && orderStatus.Status == order.Status {
+		return true, nil
+	}
 	return false, nil
 }
 
